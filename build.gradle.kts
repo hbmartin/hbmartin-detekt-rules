@@ -15,7 +15,7 @@ dependencies {
     testImplementation("io.gitlab.arturbosch.detekt:detekt-test:1.23.1")
     testImplementation("io.kotest:kotest-assertions-core:5.6.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.6")
 
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.1")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors:1.23.1")
