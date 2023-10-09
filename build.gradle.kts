@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
     jacoco
-    id("com.github.ben-manes.versions") version "0.47.0"
+    id("com.github.ben-manes.versions") version "0.49.0"
 }
 
 group = "me.haroldmartin.detektrules"
