@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.rules.KotlinCoreEnvironmentTest
 import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.junit.jupiter.api.Test
 
@@ -20,5 +21,6 @@ internal class MutableTypeShouldBePrivateTest(private val env: KotlinCoreEnviron
         """
         val findings = MutableTypeShouldBePrivate(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 1
+        findings[0].message shouldBe "shouldError should be private since it is a mutable type."
     }
 }
