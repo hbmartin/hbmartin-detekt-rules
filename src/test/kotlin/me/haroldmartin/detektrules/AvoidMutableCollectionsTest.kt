@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.rules.KotlinCoreEnvironmentTest
 import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.junit.jupiter.api.Test
 
@@ -24,11 +25,17 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
     fun `reports on mutable declarations`() {
         val code = """
         val mutableSet = mutableSetOf<String>()
-        val mutableSet = mutableListOf<String>()
+        val mutableList = mutableListOf<String>()
         val mutableMap = mutableMapOf<String, String>()
         """
         val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 3
+        findings[0].message shouldBe
+            "Mutable collection type MutableSet<String> used in mutableSetOf<String>()"
+        findings[1].message shouldBe
+            "Mutable collection type MutableList<String> used in mutableListOf<String>()"
+        findings[2].message shouldBe "Mutable collection type MutableMap<String, String> used in " +
+            "mutableMapOf<String, String>()"
     }
 
     @Test
