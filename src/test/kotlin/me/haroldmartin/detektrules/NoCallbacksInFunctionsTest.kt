@@ -117,7 +117,7 @@ inline fun myinline(function: () -> Unit) {
     }
 }
 
-internal class KeyedConfig(private val key: String, private val value: Boolean) : Config {
+internal class KeyedConfig<X : Any>(private val key: String, private val value: X) : Config {
 
     override fun subConfig(key: String): Config = KeyedConfig(this.key, value)
 
