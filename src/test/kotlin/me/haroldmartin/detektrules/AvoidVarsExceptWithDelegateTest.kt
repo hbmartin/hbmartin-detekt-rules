@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.rules.KotlinCoreEnvironmentTest
 import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.junit.jupiter.api.Test
 
@@ -19,5 +20,8 @@ internal class AvoidVarsExceptWithDelegateTest(private val env: KotlinCoreEnviro
         """
         val findings = AvoidVarsExceptWithDelegate(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 2
+        findings[0].message shouldBe "Property shouldError is a `var`iable, please make it a val."
+        findings[1].message shouldBe "Property delegatedUnknown is a delegated `var`iable but the " +
+            "delegate is not allowed. Change to val or configure allowed delegates regex list"
     }
 }

@@ -1,13 +1,16 @@
+import com.vanniktech.maven.publish.SonatypeHost
+import java.net.URI
+
 plugins {
     kotlin("jvm") version "2.0.0"
-    `maven-publish`
     alias(libs.plugins.detekt)
     jacoco
     id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.vanniktech.maven.publish") version "0.29.0"
 }
 
 group = "me.haroldmartin.detektrules"
-version = "0.1.4"
+version = "0.1.5"
 
 dependencies {
     compileOnly(libs.detekt.api)
@@ -41,14 +44,49 @@ tasks.jacocoTestReport {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+
+    coordinates("me.haroldmartin", "hbmartin-detekt-rules", version as String)
+
+    pom {
+        name.set("Hbmartin's Detekt Rules")
+        description.set("A somewhat opinionated ruleset for Detekt, primarily intended to avoid crashes and bugs related to mutability.")
+        inceptionYear.set("2023")
+        url.set("https://github.com/hbmartin/hbmartin-detekt-rules")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("hmartin")
+                name.set("Harold Martin")
+                url.set("https://github.com/hbmartin/")
+            }
+        }
+        scm {
+            url.set("https://github.com/hbmartin/hbmartin-detekt-rules/")
+            connection.set("scm:git:git://github.com/hbmartin/hbmartin-detekt-rules.git")
+            developerConnection.set("scm:git:ssh://git@github.com/hbmartin/hbmartin-detekt-rules.git")
         }
     }
 }
 
+
 detekt {
     allRules = true
+}
+
+tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
+    checkForGradleUpdate = true
+    rejectVersionIf {
+        listOf("-RC", "-Beta", "-M1", "-M2").any { word ->
+            candidate.version.contains(word)
+        }
+    }
 }

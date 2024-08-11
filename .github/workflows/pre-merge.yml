@@ -8,16 +8,6 @@ on:
       - '*'
 
 jobs:
-  publish:
-    name: Check that the publish plugin works
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-      - name: Check that the publish plugin works
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: publishToMavenLocal
   run-detekt:
     name: Run Detekt on the detekt rules
     runs-on: ubuntu-latest
@@ -31,4 +21,4 @@ jobs:
       - name: Run Detekt on the detekt rules
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: detektMain
+          arguments: assemble detektMain
