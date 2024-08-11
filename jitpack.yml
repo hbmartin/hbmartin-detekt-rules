@@ -1,4 +1,4 @@
 jdk:
   - openjdk17
 install:
-  - ./gradlew :assemble :publishToMavenLocal
+  - ./gradlew :assemble :publishToMavenLocal -Pjitpack=true

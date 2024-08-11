@@ -24,4 +24,15 @@ internal class AvoidVarsExceptWithDelegateTest(private val env: KotlinCoreEnviro
         findings[1].message shouldBe "Property delegatedUnknown is a delegated `var`iable but the " +
             "delegate is not allowed. Change to val or configure allowed delegates regex list"
     }
+
+    @Test
+    fun `does not report on vars with configured delegates`() {
+        val code = """
+        var delegatedUnknown by notInDefaultDelegate { mutableStateOf(default) }
+        """
+        val findings = AvoidVarsExceptWithDelegate(
+            config = KeyedConfig("allowedDelegates", listOf("notInDefaultDelegate")),
+        ).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
 }

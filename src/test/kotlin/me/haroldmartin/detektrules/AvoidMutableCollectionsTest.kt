@@ -61,6 +61,17 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
     }
 
     @Test
+    fun `reports on mutable collections within non mutable collections`() {
+        val code = """
+        val mutableSet = setOf(mutableSetOf<String>())
+        val mutableList = listOf(mutableListOf<String>())
+        val mutableMap = mapOf('test' to mutableMapOf<String, String>())
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 3
+    }
+
+    @Test
     fun `does not report on immutable class fields`() {
         val code = """
         data class BadBadNotGood(

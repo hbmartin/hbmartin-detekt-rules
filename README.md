@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/github/hbmartin/hbmartin-detekt-rules/branch/main/graph/badge.svg?token=5CIMCMO3K3)](https://codecov.io/github/hbmartin/hbmartin-detekt-rules)
 [![CodeFactor](https://www.codefactor.io/repository/github/hbmartin/hbmartin-detekt-rules/badge)](https://www.codefactor.io/repository/github/hbmartin/hbmartin-detekt-rules)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=hbmartin_hbmartin-detekt-rules&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=hbmartin_intellij-build-webhook-notifier)
-[![Release](https://jitpack.io/v/hbmartin/hbmartin-detekt-rules.svg)](https://jitpack.io/#hbmartin/hbmartin-detekt-rules)
+[![Maven Central Version](https://img.shields.io/maven-central/v/me.haroldmartin/hbmartin-detekt-rules)](https://central.sonatype.com/artifact/me.haroldmartin/hbmartin-detekt-rules)
 
 
 These are my opinions. There are many like them but these are mine. 😄
@@ -14,7 +14,7 @@ These are my opinions. There are many like them but these are mine. 😄
 
 Inside of your `dependencies` block add the following: (for more details see [adding more rule sets](https://github.com/detekt/detekt#adding-more-rule-sets))
 ```kotlin 
-detektPlugins("me.haroldmartin:hbmartin-detekt-rules:0.1.5")
+detektPlugins("me.haroldmartin:hbmartin-detekt-rules:0.1.6")
 ```
 
 Then add to your detekt configuration as in the section below to activate rules. Note that the AvoidFirstOrLastOnList and AvoidMutableCollections rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution) to be active.

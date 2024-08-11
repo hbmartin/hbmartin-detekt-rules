@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "me.haroldmartin.detektrules"
-version = "0.1.5"
+version = "0.1.6"
 
 dependencies {
     compileOnly(libs.detekt.api)
@@ -46,9 +46,13 @@ tasks.jacocoTestReport {
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
+    if (properties["jitpack"] != "true") {
+        signAllPublications()
+        coordinates("me.haroldmartin", "hbmartin-detekt-rules", version as String)
+    } else {
+        coordinates("me.haroldmartin.detektrules", "hbmartin-detekt-rules", version as String)
+    }
 
-    coordinates("me.haroldmartin", "hbmartin-detekt-rules", version as String)
 
     pom {
         name.set("Hbmartin's Detekt Rules")
@@ -88,5 +92,11 @@ tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
         listOf("-RC", "-Beta", "-M1", "-M2").any { word ->
             candidate.version.contains(word)
         }
+    }
+}
+
+task("printVersion") {
+    doLast {
+        print(version)
     }
 }

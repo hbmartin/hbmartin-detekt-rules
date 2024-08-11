@@ -17,6 +17,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Publish Library
         run: |
+          echo ${{ github.ref }}
+          GRADLE_REPORTED_VERSION=$(./gradlew printVersion -q)
+          echo $GRADLE_REPORTED_VERSION
+          if [ "${{ github.ref }}" != "$GRADLE_REPORTED_VERSION" ]; then
+            echo "Error: Release tag and gradle version are not equal."
+            exit 1
+          fi
           ./gradlew assemble publishAndReleaseToMavenCentral --no-configuration-cache --no-parallel
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
