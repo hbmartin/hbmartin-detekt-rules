@@ -22,6 +22,5 @@ HbmartinRuleSet:
     allowExtensions: true
     allowReceivers: true
     allowInline: false
-
   WhenBranchSingleLineOrBraces:
     active: true
