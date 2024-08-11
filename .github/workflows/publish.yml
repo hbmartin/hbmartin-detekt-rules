@@ -20,7 +20,7 @@ jobs:
           echo ${{ github.ref }}
           GRADLE_REPORTED_VERSION=$(./gradlew printVersion -q)
           echo $GRADLE_REPORTED_VERSION
-          if [ "${{ github.ref }}" != "$GRADLE_REPORTED_VERSION" ]; then
+          if [ "${{ github.ref }}" != "refs/tags/$GRADLE_REPORTED_VERSION" ]; then
             echo "Error: Release tag and gradle version are not equal."
             exit 1
           fi
