@@ -5,6 +5,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: github.repository == 'hbmartin/hbmartin-detekt-rules'
     steps:
       - uses: actions/checkout@v4
       - name: Set up Maven Central Repository
@@ -12,11 +13,13 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-          server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-      - name: Publish package
-        run: mvn --batch-mode deploy
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Publish Library
+        run: |
+          ./gradlew assemble publishAndReleaseToMavenCentral --no-configuration-cache --no-parallel
         env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
