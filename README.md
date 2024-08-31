@@ -19,6 +19,24 @@ detektPlugins("me.haroldmartin:hbmartin-detekt-rules:0.1.6")
 
 Then add to your detekt configuration as in the section below to activate rules. Note that the AvoidFirstOrLastOnList and AvoidMutableCollections rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution) to be active.
 
+## Type Resolution
+
+Some of these rules require type resolution, which typically happens when running `detect*Main` task. For more details (including instructions for multiplatform) see [Using Type Resolution](https://detekt.dev/docs/gettingstarted/type-resolution/) in the detekt docs.
+
+If you rely on the `check` task to run detekt, you can replace the default detekt chek with a typed check using a configuration like:
+
+```kotlin
+tasks.named("check").configure {
+     this.setDependsOn(
+         this.dependsOn.filterNot {
+             it is TaskProvider<*> && it.name == "detekt"
+         } + tasks.named("detektMain"),
+     )
+ }
+```
+
+
+
 ## Configuration
 
 Add below to your `detekt.yml` and modify to suit your needs. Only the `AvoidVarsExceptWithDelegate` rule has additional configuration options, where you may provide a regex to allow additional variable delegates. 
