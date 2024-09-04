@@ -55,6 +55,23 @@ internal class WhenBranchSingleLineOrBracesTest(private val env: KotlinCoreEnvir
     }
 
     @Test
+    fun `does not report on branches with nested when`() {
+        val code = """
+        val a = 1
+        val b = 1
+        val b = when (a) {
+            1 -> "yes"
+            else -> when (b) {
+                1 -> "yes"
+                else -> "no"
+            }
+        }
+        """
+        val findings = WhenBranchSingleLineOrBraces(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
+
+    @Test
     fun `report on branches on the same line with excess spacing`() {
         val code = """
         val a = 1
