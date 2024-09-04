@@ -22,5 +22,7 @@ HbmartinRuleSet:
     allowExtensions: true
     allowReceivers: true
     allowInline: false
+  UseNamedParameters:
+    active: true
   WhenBranchSingleLineOrBraces:
     active: true
