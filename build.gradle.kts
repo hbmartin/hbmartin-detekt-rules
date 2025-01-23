@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") version "2.0.21"
     alias(libs.plugins.detekt)
     jacoco
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
     id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
