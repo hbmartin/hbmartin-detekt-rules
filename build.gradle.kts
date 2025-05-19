@@ -1,7 +1,7 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.1.21"
     alias(libs.plugins.detekt)
     jacoco
     id("com.github.ben-manes.versions") version "0.52.0"
