@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.detekt)
     jacoco
     id("com.github.ben-manes.versions") version "0.52.0"
-    id("com.vanniktech.maven.publish") version "0.30.0"
+    id("com.vanniktech.maven.publish") version "0.33.0"
 }
 
 group = "me.haroldmartin.detektrules"
