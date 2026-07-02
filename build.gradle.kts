@@ -15,9 +15,10 @@ dependencies {
     compileOnly(libs.detekt.api)
 
     testImplementation(libs.detekt.test)
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotlinx.collections.immutable)
+    testImplementation(libs.kotlinx.coroutines.core)
 
     detektPlugins(libs.detekt.formatting)
     detektPlugins(libs.detekt.ruleauthors)
@@ -31,7 +32,7 @@ kotlin {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     systemProperty("junit.jupiter.testinstance.lifecycle.default", "per_class")
-    systemProperty("compile-snippet-tests", project.hasProperty("compile-test-snippets"))
+    systemProperty("compile-test-snippets", project.hasProperty("compile-test-snippets"))
 }
 
 tasks.jacocoTestReport {
