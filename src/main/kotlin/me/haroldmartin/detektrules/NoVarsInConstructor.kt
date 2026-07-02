@@ -11,6 +11,18 @@ import io.gitlab.arturbosch.detekt.rules.identifierName
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.allConstructors
 
+/**
+ * Reports `var` parameters in class constructors since mutable state is likely to lead to bugs.
+ * Prefer `val` and create modified copies as needed, e.g. with a data class `copy`.
+ *
+ * <noncompliant>
+ * class Thing(var name: String)
+ * </noncompliant>
+ *
+ * <compliant>
+ * class Thing(val name: String)
+ * </compliant>
+ */
 class NoVarsInConstructor(config: Config) : Rule(config) {
     override val issue: Issue = Issue(
         id = javaClass.simpleName,

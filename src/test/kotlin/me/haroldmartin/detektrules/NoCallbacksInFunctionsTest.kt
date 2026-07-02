@@ -43,7 +43,7 @@ internal class NoCallbacksInFunctionsTest(private val env: KotlinCoreEnvironment
             anotherCallback5: (Any) -> Unit,
             anotherParameter: List<Int>,
         ) {
-            callback(true)
+            callback4(true)
         }
         """
         val findings = NoCallbacksInFunctions(Config.empty).compileAndLintWithContext(env, code)
@@ -53,9 +53,9 @@ internal class NoCallbacksInFunctionsTest(private val env: KotlinCoreEnvironment
     @Test
     fun `does not report extension function`() {
         val code = """
-private fun List<T>.forEach(function: (T) -> Unit) {
-    for (i in 0 until length) {
-        function(item(i))
+private fun <T> List<T>.visitEach(function: (T) -> Unit) {
+    for (i in 0 until size) {
+        function(get(i))
     }
 }
         """
@@ -76,9 +76,9 @@ fun mydsl(function: String.() -> Unit) {
     @Test
     fun `does report extension function if disallowed`() {
         val code = """
-private fun List<T>.forEach(function: (T) -> Unit) {
-    for (i in 0 until length) {
-        function(item(i))
+private fun <T> List<T>.visitEach(function: (T) -> Unit) {
+    for (i in 0 until size) {
+        function(get(i))
     }
 }
         """

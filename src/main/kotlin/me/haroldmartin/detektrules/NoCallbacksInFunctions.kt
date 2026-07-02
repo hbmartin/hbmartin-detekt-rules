@@ -14,6 +14,21 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.psiUtil.isExtensionDeclaration
 
+/**
+ * Reports function-type (callback) parameters in functions. Callbacks mix concurrency paradigms
+ * and are likely to lead to bugs or stalled threads, prefer suspend functions instead. Receiver
+ * lambdas, extension functions, and inline functions can be permitted with the `allowReceivers`,
+ * `allowExtensions`, and `allowInline` options, and `ignoreAnnotated: ['Composable']` permits
+ * callbacks in composables.
+ *
+ * <noncompliant>
+ * fun fetchThing(callback: (Thing) -> Unit) { }
+ * </noncompliant>
+ *
+ * <compliant>
+ * suspend fun fetchThing(): Thing = api.getThing()
+ * </compliant>
+ */
 class NoCallbacksInFunctions(config: Config) : Rule(config) {
     override val issue = Issue(
         id = javaClass.simpleName,

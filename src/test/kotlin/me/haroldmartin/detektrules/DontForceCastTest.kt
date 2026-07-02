@@ -26,16 +26,17 @@ internal class DontForceCastTest(private val env: KotlinCoreEnvironment) {
         sealed class LoadingState<T : Any> {
             class Loading<T : Any> : LoadingState<T>()
             data class Success<T : Any>(val payload: T) : LoadingState<T>()
-            data class ErrorOnLoad<T : Any>(val error: TextResource) : LoadingState<T>()
+            data class ErrorOnLoad<T : Any>(val error: String) : LoadingState<T>()
         }
-        
+
         fun shouldError(state: LoadingState<Int>): Unit {
-            val isLoading = state is LoadingState.Loading
+            val isLoading = state is LoadingState.Loading<*>
             val payload = if (!isLoading) {
-                (state as LoadingState.Success).payload
+                (state as LoadingState.Success<Int>).payload
             } else {
                 null
             }
+            println(payload)
         }
         """
         val findings = DontForceCast(Config.empty).compileAndLintWithContext(env, code)

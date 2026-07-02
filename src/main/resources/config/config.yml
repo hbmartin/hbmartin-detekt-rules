@@ -1,8 +1,38 @@
 HbmartinRuleSet:
   AvoidFirstOrLastOnList:
     active: true
+    methods:
+      - 'first'
+      - 'last'
+      - 'single'
+      - 'elementAt'
+      - 'reduce'
+      - 'reduceRight'
+      - 'max'
+      - 'min'
+      - 'maxBy'
+      - 'minBy'
+  AvoidGlobalScope:
+    active: true
   AvoidMutableCollections:
     active: true
+    allowPrivateAndLocal: false
+  AvoidToIntOrThrowingConversions:
+    active: true
+    methods:
+      - 'toInt'
+      - 'toLong'
+      - 'toShort'
+      - 'toByte'
+      - 'toDouble'
+      - 'toFloat'
+      - 'toUInt'
+      - 'toULong'
+      - 'toUShort'
+      - 'toUByte'
+      - 'toBigDecimal'
+      - 'toBigInteger'
+      - 'toBooleanStrict'
   AvoidVarsExceptWithDelegate:
     active: true
     allowedDelegates:
@@ -12,15 +42,23 @@ HbmartinRuleSet:
     active: true
   MutableTypeShouldBePrivate:
     active: true
-  NoNotNullOperator:
-    active: true
-  NoVarsInConstructor:
-    active: true
+    allowedTypes: []
   NoCallbacksInFunctions:
     active: true
     ignoreAnnotated: ['Composable']
     allowExtensions: true
     allowReceivers: true
     allowInline: false
+  NoDeferredResultInPublicApi:
+    active: true
+  NoLateinitVar:
+    active: true
+    allowedAnnotations: []
+  NoNotNullOperator:
+    active: true
+  NoRunBlocking:
+    active: true
+  NoVarsInConstructor:
+    active: true
   WhenBranchSingleLineOrBraces:
     active: true
