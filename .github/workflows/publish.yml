@@ -1,7 +1,9 @@
 name: Publish package to the Maven Central Repository
+# `published` (not `created`) so that saving a release draft, e.g. from Release Drafter,
+# does not trigger publishing; only publishing the release does.
 on:
   release:
-    types: [created]
+    types: [published]
 jobs:
   publish:
     runs-on: ubuntu-latest
