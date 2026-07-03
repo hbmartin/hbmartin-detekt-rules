@@ -13,6 +13,7 @@ internal class AvoidVarsExceptWithDelegateTest(private val env: KotlinCoreEnviro
     @Test
     fun `reports on vars with unknown delegates`() {
         val code = """
+        $DELEGATE_HELPERS
         val shouldNotError = "hi"
         var shouldError = "hi"
         var delegated by remember { mutableStateOf(default) }
@@ -28,6 +29,7 @@ internal class AvoidVarsExceptWithDelegateTest(private val env: KotlinCoreEnviro
     @Test
     fun `does not report on vars with configured delegates`() {
         val code = """
+        $DELEGATE_HELPERS
         var delegatedUnknown by notInDefaultDelegate { mutableStateOf(default) }
         """
         val findings = AvoidVarsExceptWithDelegate(
@@ -36,3 +38,20 @@ internal class AvoidVarsExceptWithDelegateTest(private val env: KotlinCoreEnviro
         findings shouldHaveSize 0
     }
 }
+
+// Compilable stand-ins for Compose-style delegate providers used in the snippets above.
+private val DELEGATE_HELPERS = """
+        import kotlin.properties.ReadWriteProperty
+        import kotlin.reflect.KProperty
+
+        class Holder<T>(private var held: T) : ReadWriteProperty<Any?, T> {
+            override fun getValue(thisRef: Any?, property: KProperty<*>): T = held
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+                held = value
+            }
+        }
+        fun <T> remember(block: () -> Holder<T>): Holder<T> = block()
+        fun <T> notInDefaultDelegate(block: () -> Holder<T>): Holder<T> = block()
+        fun <T> mutableStateOf(value: T): Holder<T> = Holder(value)
+        val default = "hi"
+"""

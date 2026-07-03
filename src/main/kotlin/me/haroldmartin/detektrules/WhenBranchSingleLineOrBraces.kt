@@ -10,6 +10,27 @@ import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.com.intellij.psi.PsiWhiteSpace
 import org.jetbrains.kotlin.psi.KtWhenEntry
 
+/**
+ * A stylistic rule requiring that a `when` branch body either starts on the same line as the arrow
+ * with a single space after it, or uses braces.
+ *
+ * <noncompliant>
+ * when (thing) {
+ *     1 ->
+ *         "one"
+ *     else -> "other"
+ * }
+ * </noncompliant>
+ *
+ * <compliant>
+ * when (thing) {
+ *     1 -> "one"
+ *     else -> {
+ *         "other"
+ *     }
+ * }
+ * </compliant>
+ */
 class WhenBranchSingleLineOrBraces(config: Config) : Rule(config) {
     override val issue: Issue = Issue(
         id = javaClass.simpleName,

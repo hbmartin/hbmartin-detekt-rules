@@ -12,6 +12,19 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
 
+/**
+ * Reports `var` properties since mutable state is likely to lead to bugs, prefer a `val` or a
+ * reactive type such as a `Flow`. An exception is made for `var`s implemented with a delegate
+ * matching one of the `allowedDelegates` regexes, which is particularly common with Compose.
+ *
+ * <noncompliant>
+ * var counter = 0
+ * </noncompliant>
+ *
+ * <compliant>
+ * var counter by remember { mutableStateOf(0) }
+ * </compliant>
+ */
 class AvoidVarsExceptWithDelegate(config: Config) : Rule(config) {
     override val issue: Issue = Issue(
         id = javaClass.simpleName,

@@ -2,6 +2,7 @@ package me.haroldmartin.detektrules
 
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.rules.KotlinCoreEnvironmentTest
+import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -14,7 +15,7 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
     fun `does not report on immutable declarations`() {
         val code = """
         val immutableSet = setOf<String>()
-        val immutableSet = listOf<String>()
+        val immutableList = listOf<String>()
         val immutableMap = mapOf<String, String>()
         """
         val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
@@ -50,14 +51,23 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
     }
 
     @Test
-    fun `reports on mutable function return types`() {
+    fun `reports once per mutable function return type`() {
         val code = """
         fun mutableSet(): MutableSet<String> = mutableSetOf()
         fun mutableList(): MutableList<String> = mutableListOf()
         fun mutableMap(): MutableMap<String, String> = mutableMapOf()
         """
         val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
-        findings shouldHaveSize 6
+        findings shouldHaveSize 3
+    }
+
+    @Test
+    fun `reports once per mutable property with explicit type`() {
+        val code = """
+        val mutableSet: MutableSet<String> = mutableSetOf()
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
     }
 
     @Test
@@ -65,7 +75,7 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
         val code = """
         val mutableSet = setOf(mutableSetOf<String>())
         val mutableList = listOf(mutableListOf<String>())
-        val mutableMap = mapOf('test' to mutableMapOf<String, String>())
+        val mutableMap = mapOf("test" to mutableMapOf<String, String>())
         """
         val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 3
@@ -124,7 +134,61 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
             return this
         }
         """
+        // one report each for the receiver type and the return type, but not for `return this`
         val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
-        findings shouldHaveSize 3
+        findings shouldHaveSize 2
+    }
+
+    @Test
+    fun `does not report flexible platform types from java interop`() {
+        val code = """
+        val env = System.getenv()
+        val props = java.lang.Thread.getAllStackTraces()
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
+
+    @Test
+    fun `does not report inside collection builders`() {
+        val code = """
+        val builtList: List<Int> = buildList {
+            add(1)
+            this.addAll(listOf(2, 3))
+        }
+        val builtSet: Set<Int> = buildSet { add(1) }
+        val builtMap: Map<String, Int> = buildMap { put("hi", 1) }
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
+
+    @Test
+    fun `does not report private or local mutable collections when allowed`() {
+        val code = """
+        class Things {
+            private val mutableSet: MutableSet<String> = mutableSetOf()
+            fun localScope(): List<String> {
+                val mutableList = mutableListOf("hi")
+                mutableList.add("bye")
+                return mutableList.toList()
+            }
+        }
+        """
+        val config = TestConfig("allowPrivateAndLocal" to "true")
+        val findings = AvoidMutableCollections(config).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
+
+    @Test
+    fun `reports public mutable collections when private and local are allowed`() {
+        val code = """
+        class Things {
+            val mutableSet: MutableSet<String> = mutableSetOf()
+        }
+        """
+        val config = TestConfig("allowPrivateAndLocal" to "true")
+        val findings = AvoidMutableCollections(config).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
     }
 }

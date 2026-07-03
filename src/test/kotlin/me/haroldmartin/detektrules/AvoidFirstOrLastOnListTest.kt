@@ -2,8 +2,10 @@ package me.haroldmartin.detektrules
 
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.rules.KotlinCoreEnvironmentTest
+import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.string.shouldContain
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.junit.jupiter.api.Test
 
@@ -99,6 +101,90 @@ internal class AvoidFirstOrLastOnListTest(private val env: KotlinCoreEnvironment
     }
 
     @Test
+    fun `reports safe call of first() on nullable list`() {
+        val code = """
+        fun testing(things: List<String>?): String? = things?.first()
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `reports first() with predicate and suggests firstOrNull with predicate`() {
+        val code = """
+        val shouldError = listOf(1, 2, 3).first { it > 1 }
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+        findings[0].message shouldContain "firstOrNull { ... }"
+    }
+
+    @Test
+    fun `reports callable reference to first on list`() {
+        val code = """
+        val things = listOf("hi")
+        val shouldError: () -> String = things::first
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `reports single() and elementAt() calls on list`() {
+        val code = """
+        val shouldError = listOf("hi").single()
+        val shouldErrorAgain = listOf("hi").elementAt(4)
+        val shouldNotError = listOf("hi").singleOrNull()
+        val shouldNotErrorAgain = listOf("hi").elementAtOrNull(4)
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 2
+    }
+
+    @Test
+    fun `reports reduce() call on list`() {
+        val code = """
+        val shouldError = listOf(1, 2, 3).reduce { acc, i -> acc + i }
+        val shouldNotError = listOf(1, 2, 3).reduceOrNull { acc, i -> acc + i }
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `reports first() call on array and sequence`() {
+        val code = """
+        val shouldError = arrayOf("hi").first()
+        val shouldErrorAgain = sequenceOf("hi").first()
+        val shouldErrorEvenMore = intArrayOf(1, 2).first()
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 3
+    }
+
+    @Test
+    fun `reports first() call on chained expression`() {
+        val code = """
+        fun makeList(): List<String> = listOf("hi")
+        val shouldError = makeList().first()
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `only reports configured methods`() {
+        val code = """
+        val shouldError = listOf("hi").last()
+        val shouldNotError = listOf("hi").first()
+        """
+        val config = TestConfig("methods" to listOf("last"))
+        val findings = AvoidFirstOrLastOnList(config).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+        findings[0].message shouldContain "lastOrNull"
+    }
+
+    @Test
     fun `should not report first() call on non-list method`() {
         val code = """
         class HasFirstButNotList {
@@ -119,6 +205,16 @@ internal class AvoidFirstOrLastOnListTest(private val env: KotlinCoreEnvironment
             return "hi"
         }
         val a = first()
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
+
+    @Test
+    fun `should not report firstOrNull() or map access`() {
+        val code = """
+        val shouldNotError = listOf("hi").firstOrNull()
+        val shouldNotErrorEither = mapOf("hi" to 1).values.firstOrNull()
         """
         val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0

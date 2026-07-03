@@ -9,6 +9,18 @@ import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 
+/**
+ * Reports unsafe casts with `as`, which throw `ClassCastException` when the value has an
+ * unexpected type. Prefer safely casting with `as?` and handling the `null` case.
+ *
+ * <noncompliant>
+ * val name = thing as String
+ * </noncompliant>
+ *
+ * <compliant>
+ * val name = thing as? String ?: "unknown"
+ * </compliant>
+ */
 class DontForceCast(config: Config) : Rule(config) {
     override val issue: Issue = Issue(
         id = javaClass.simpleName,

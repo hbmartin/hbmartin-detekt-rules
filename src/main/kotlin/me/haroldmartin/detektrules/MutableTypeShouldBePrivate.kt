@@ -7,9 +7,25 @@ import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
+import io.gitlab.arturbosch.detekt.api.config
+import io.gitlab.arturbosch.detekt.api.internal.Configuration
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
+/**
+ * Reports publicly exposed `Mutable*` types, e.g. `MutableStateFlow`, since mutation by consumers
+ * can lead to unexpected behavior. Prefer exposing a read-only type instead, e.g. with
+ * `_mutableStateFlow.asStateFlow()`. Type names matching a regex in `allowedTypes` are permitted.
+ *
+ * <noncompliant>
+ * val state = MutableStateFlow(0)
+ * </noncompliant>
+ *
+ * <compliant>
+ * private val _state = MutableStateFlow(0)
+ * val state = _state.asStateFlow()
+ * </compliant>
+ */
 class MutableTypeShouldBePrivate(config: Config) : Rule(config) {
     override val issue = Issue(
         id = javaClass.simpleName,
@@ -18,11 +34,16 @@ class MutableTypeShouldBePrivate(config: Config) : Rule(config) {
         debt = Debt.FIVE_MINS,
     )
 
+    @Configuration("regexes of mutable type names that are allowed to be exposed publicly")
+    private val allowedTypes: List<Regex> by config(emptyList<String>()) {
+        it.map(String::toRegex)
+    }
+
     override fun visitProperty(property: KtProperty) {
         super.visitProperty(property)
         if (property.isPrivate()) return
         property.guessType()?.let { type ->
-            if (type.startsWith("Mutable")) {
+            if (type.startsWith("Mutable") && !allowedTypes.any { it.matches(type.substringBefore('<')) }) {
                 report(
                     CodeSmell(
                         issue = issue,
