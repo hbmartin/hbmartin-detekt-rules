@@ -1,5 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
     kotlin("jvm") version "2.2.21"
     alias(libs.plugins.detekt)
@@ -46,7 +44,7 @@ tasks.jacocoTestReport {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
     if (properties["jitpack"] != "true") {
         signAllPublications()
         coordinates("me.haroldmartin", "hbmartin-detekt-rules", version as String)
