@@ -184,4 +184,3 @@ A stylistic rule that require that either a when expression be on a single line 
 
 * [Harold Martin](https://www.linkedin.com/in/harold-martin-98526971/) - harold.martin at gmail
 * Significant inspiration from [kure-potlin by neeffect](https://github.com/neeffect/kure-potlin) and [Doist detekt-rules](https://github.com/Doist/detekt-rules)
-

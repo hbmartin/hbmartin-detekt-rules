@@ -16,16 +16,17 @@ dependencies {
     testImplementation(libs.detekt.test)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.kotlinx.collections.immutable)
     testImplementation(libs.kotlinx.coroutines.core)
 
     detektPlugins(libs.detekt.formatting)
     detektPlugins(libs.detekt.ruleauthors)
-    detektPlugins(rootProject)
+    detektPlugins(project(":"))
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(21)
 }
 
 tasks.withType<Test>().configureEach {
@@ -45,7 +46,7 @@ tasks.jacocoTestReport {
 
 mavenPublishing {
     publishToMavenCentral()
-    if (properties["jitpack"] != "true") {
+    if (providers.gradleProperty("jitpack").orNull != "true") {
         signAllPublications()
         coordinates("me.haroldmartin", "hbmartin-detekt-rules", version as String)
     } else {
@@ -108,7 +109,7 @@ tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
     }
 }
 
-task("printVersion") {
+tasks.register("printVersion") {
     doLast {
         print(version)
     }
