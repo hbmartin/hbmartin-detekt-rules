@@ -75,7 +75,9 @@ private fun KtNamedFunction.isReportableDeclaration(): Boolean =
 private fun KtProperty.isReportableDeclaration(): Boolean =
     isPublic && !isLocal && !hasModifier(KtTokens.OVERRIDE_KEYWORD)
 
-private fun KtTypeReference.isDeferredType(bindingContext: BindingContext): Boolean =
-    bindingContext[BindingContext.TYPE, this]?.run {
-        constructor.declarationDescriptor?.fqNameSafe?.asString()
-    } == "kotlinx.coroutines.Deferred"
+private fun KtTypeReference.isDeferredType(bindingContext: BindingContext): Boolean {
+    val descriptor = bindingContext[BindingContext.TYPE, this]?.run {
+        constructor.declarationDescriptor
+    } ?: return false
+    return descriptor.fqNameSafe.asString() == "kotlinx.coroutines.Deferred"
+}
