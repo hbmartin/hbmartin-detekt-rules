@@ -6,6 +6,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/hbmartin/hbmartin-detekt-rules/badge)](https://www.codefactor.io/repository/github/hbmartin/hbmartin-detekt-rules)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=hbmartin_hbmartin-detekt-rules&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=hbmartin_intellij-build-webhook-notifier)
 [![Maven Central Version](https://img.shields.io/maven-central/v/me.haroldmartin/hbmartin-detekt-rules)](https://central.sonatype.com/artifact/me.haroldmartin/hbmartin-detekt-rules)
+[![KDoc](https://img.shields.io/badge/KDoc-GitHub%20Pages-blue)](https://hbmartin.github.io/hbmartin-detekt-rules/)
 
 
 These are my opinions. There are many like them but these are mine. 😄

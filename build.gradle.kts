@@ -6,6 +6,7 @@ plugins {
     jacoco
     id("com.github.ben-manes.versions") version "0.52.0"
     id("com.vanniktech.maven.publish") version "0.34.0"
+    id("org.jetbrains.dokka") version "2.2.0"
 }
 
 group = "me.haroldmartin.detektrules"
@@ -84,6 +85,20 @@ mavenPublishing {
 
 detekt {
     allRules = true
+}
+
+dokka {
+    dokkaPublications.html {
+        moduleName.set("Hbmartin's Detekt Rules")
+        moduleVersion.set(project.version.toString())
+    }
+    dokkaSourceSets.main {
+        sourceLink {
+            localDirectory.set(file("src/main/kotlin"))
+            remoteUrl("https://github.com/hbmartin/hbmartin-detekt-rules/tree/main/src/main/kotlin")
+            remoteLineSuffix.set("#L")
+        }
+    }
 }
 
 tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
