@@ -324,6 +324,7 @@ naming:
     forbiddenName: []
   FunctionMaxLength:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     maximumFunctionNameLength: 30
   FunctionMinLength:
     active: true
@@ -631,6 +632,7 @@ style:
     maxChainedCalls: 5
   MaxLineLength:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     maxLineLength: 120
     excludePackageStatements: true
     excludeImportStatements: true
@@ -638,6 +640,7 @@ style:
     excludeRawStrings: true
   MayBeConst:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
   ModifierOrder:
     active: true
   MultilineLambdaItParameter:
@@ -698,6 +701,7 @@ style:
     active: true
   TrimMultilineRawString:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     trimmingMethods:
       - 'trimIndent'
       - 'trimMargin'
@@ -740,6 +744,7 @@ style:
     allowedNames: ''
   UnusedPrivateProperty:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     allowedNames: '_|ignored|expected|serialVersionUID'
   UseAnyOrNoneInsteadOfFind:
     active: true
@@ -751,6 +756,7 @@ style:
     active: true
   UseDataClass:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     allowVars: false
   UseEmptyCounterpart:
     active: true
@@ -796,6 +802,7 @@ formatting:
     autoCorrect: true
   ArgumentListWrapping:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     autoCorrect: true
     indentSize: 4
     maxLineLength: 120
@@ -880,6 +887,7 @@ formatting:
     indentSize: 4
   MaximumLineLength:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     maxLineLength: 120
     ignoreBackTickedIdentifier: false
   ModifierListSpacing:
@@ -915,6 +923,7 @@ formatting:
     autoCorrect: true
   NoEmptyFirstLineInClassBody:
     active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     autoCorrect: true
     indentSize: 4
   NoEmptyFirstLineInMethodBlock:
@@ -1058,3 +1067,9 @@ ruleauthors:
     active: true
   ViolatesTypeResolutionRequirements:
     active: true
+
+HbmartinRuleSet:
+  MutableTypeShouldBePrivate:
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
+  NoVarsInConstructor:
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.0.21"
     alias(libs.plugins.detekt)
     jacoco
     id("com.github.ben-manes.versions") version "0.52.0"
@@ -12,6 +12,9 @@ version = "0.1.7"
 
 dependencies {
     compileOnly(libs.detekt.api)
+    implementation("org.jetbrains.kotlin:kotlin-stdlib") {
+        version { strictly("2.0.21") }
+    }
 
     testImplementation(libs.detekt.test)
     testImplementation(libs.kotest.assertions.core)
