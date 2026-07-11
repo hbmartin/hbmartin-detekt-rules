@@ -53,6 +53,9 @@ class NoLateinitVar(config: Config) : Rule(config) {
         }
     }
 
-    private fun KtProperty.hasAllowedAnnotation(): Boolean =
-        annotationEntries.any { it.shortName?.asString() in allowedAnnotations }
+    private fun KtProperty.hasAllowedAnnotation(): Boolean = annotationEntries.any { entry ->
+        entry.shortName?.asString()?.let { shortName ->
+            allowedAnnotations.any { it.substringAfterLast('.') == shortName }
+        } == true
+    }
 }

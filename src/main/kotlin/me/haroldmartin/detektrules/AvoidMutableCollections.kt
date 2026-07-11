@@ -27,7 +27,9 @@ import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
 import org.jetbrains.kotlin.resolve.calls.util.getType
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.isFlexible
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
@@ -93,11 +95,15 @@ class AvoidMutableCollections(config: Config) : Rule(config) {
 
     private fun KtExpression.isCoveredOrAllowed(type: KotlinType): Boolean =
         isCoveredByDeclaredType(type, bindingContext) ||
-            isInsideCollectionBuilder() ||
+            isInsideCollectionBuilder(bindingContext) ||
             allowPrivateAndLocal && isInPrivateOrLocalScope()
 }
 
-private val BUILDER_FUNCTION_NAMES = setOf("buildList", "buildSet", "buildMap")
+private val BUILDER_FUNCTION_FQ_NAMES = setOf(
+    "kotlin.collections.buildList",
+    "kotlin.collections.buildSet",
+    "kotlin.collections.buildMap",
+)
 
 // The declaration's explicit type reference already reports this type, so don't report it twice.
 private fun KtExpression.isCoveredByDeclaredType(type: KotlinType, bindingContext: BindingContext): Boolean =
@@ -105,12 +111,17 @@ private fun KtExpression.isCoveredByDeclaredType(type: KotlinType, bindingContex
         ?.typeReference
         ?.getAbbreviatedTypeOrType(bindingContext)
         ?.let { declared ->
-            declared.isMutableCollection && declared.getKotlinTypeFqName(false) == type.getKotlinTypeFqName(false)
+            declared.isMutableCollection && KotlinTypeChecker.DEFAULT.isSubtypeOf(type, declared)
         } == true
 
-private fun KtExpression.isInsideCollectionBuilder(): Boolean = parents
+private fun KtExpression.isInsideCollectionBuilder(bindingContext: BindingContext): Boolean = parents
     .filterIsInstance<KtCallExpression>()
-    .any { (it.calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in BUILDER_FUNCTION_NAMES }
+    .mapNotNull { it.calleeExpression as? KtNameReferenceExpression }
+    .any { callee ->
+        bindingContext[BindingContext.REFERENCE_TARGET, callee]
+            ?.fqNameSafe
+            ?.asString() in BUILDER_FUNCTION_FQ_NAMES
+    }
 
 private fun PsiElement.isInPrivateOrLocalScope(): Boolean =
     parents.filterIsInstance<KtNamedDeclaration>().any { it.isPrivate() } ||

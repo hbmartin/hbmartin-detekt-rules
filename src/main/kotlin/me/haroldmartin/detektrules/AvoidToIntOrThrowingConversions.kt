@@ -46,11 +46,13 @@ class AvoidToIntOrThrowingConversions(config: Config) : Rule(config) {
         val call = expression.selectorExpression as? KtCallExpression ?: return
         val name = (call.calleeExpression as? KtNameReferenceExpression)?.getReferencedName() ?: return
         if (name in methods && isStringReceiver(expression)) {
+            val argumentsHint = if (call.valueArguments.isEmpty()) "()" else "(...)"
             report(
                 CodeSmell(
                     issue = issue,
                     entity = Entity.from(call),
-                    message = "Use .${name}OrNull() instead of .$name() in `${expression.text}`",
+                    message = "Use .${name}OrNull$argumentsHint instead of .$name$argumentsHint " +
+                        "in `${expression.text}`",
                 ),
             )
         }

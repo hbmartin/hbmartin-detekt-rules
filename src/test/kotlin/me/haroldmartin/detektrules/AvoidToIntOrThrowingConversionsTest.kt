@@ -52,4 +52,15 @@ internal class AvoidToIntOrThrowingConversionsTest(private val env: KotlinCoreEn
         val findings = AvoidToIntOrThrowingConversions(config).compileAndLintWithContext(env, code)
         findings shouldHaveSize 1
     }
+
+    @Test
+    fun `preserves an argument hint in the replacement message`() {
+        val code = """
+        val shouldError = "ff".toInt(16)
+        """
+        val findings = AvoidToIntOrThrowingConversions(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+        findings[0].message shouldContain "toIntOrNull(...)"
+        findings[0].message shouldContain "toInt(...)"
+    }
 }

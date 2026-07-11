@@ -1,11 +1,14 @@
 package me.haroldmartin.detektrules
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.test.compileAndLint
+import io.gitlab.arturbosch.detekt.rules.KotlinCoreEnvironmentTest
+import io.gitlab.arturbosch.detekt.test.compileAndLintWithContext
 import io.kotest.matchers.collections.shouldHaveSize
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.junit.jupiter.api.Test
 
-internal class NoDeferredResultInPublicApiTest {
+@KotlinCoreEnvironmentTest
+internal class NoDeferredResultInPublicApiTest(private val env: KotlinCoreEnvironment) {
     @Test
     fun `reports public function returning Deferred`() {
         val code = """
@@ -17,7 +20,7 @@ internal class NoDeferredResultInPublicApiTest {
             fun fetchThing(): Deferred<String> = scope.async { "thing" }
         }
         """
-        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLint(code)
+        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 1
     }
 
@@ -32,7 +35,7 @@ internal class NoDeferredResultInPublicApiTest {
             val thing: Deferred<String> = scope.async { "thing" }
         }
         """
-        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLint(code)
+        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 1
     }
 
@@ -49,7 +52,7 @@ internal class NoDeferredResultInPublicApiTest {
             suspend fun thing(): String = fetchThing().await()
         }
         """
-        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLint(code)
+        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0
     }
 
@@ -65,7 +68,38 @@ internal class NoDeferredResultInPublicApiTest {
             return deferred.await()
         }
         """
-        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLint(code)
+        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0
+    }
+
+    @Test
+    fun `uses resolved types and handles nullable Deferred`() {
+        val code = """
+        class Deferred<T>
+
+        fun customDeferred(): Deferred<String> = Deferred()
+        fun nullableDeferred(): kotlinx.coroutines.Deferred<String>? = null
+        """
+        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `does not report overridden Deferred declarations`() {
+        val code = """
+        import kotlinx.coroutines.Deferred
+
+        interface Api {
+            fun fetch(): Deferred<String>
+            val pending: Deferred<String>
+        }
+
+        class Repository : Api {
+            override fun fetch(): Deferred<String> = TODO()
+            override val pending: Deferred<String> = TODO()
+        }
+        """
+        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 2
     }
 }

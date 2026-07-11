@@ -65,4 +65,4 @@ outTmp/
 /kotlin-native/dist
 kotlin-ide/
 .kotlin/
-.teamcity/
+.teamcity/reviews_triage/

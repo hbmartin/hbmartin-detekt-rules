@@ -36,4 +36,19 @@ internal class NoLateinitVarTest {
         val findings = NoLateinitVar(config).compileAndLint(code)
         findings shouldHaveSize 1
     }
+
+    @Test
+    fun `accepts fully qualified allowed annotation names`() {
+        val code = """
+        annotation class Inject
+
+        class Screen {
+            @Inject lateinit var allowed: String
+            lateinit var stillReported: String
+        }
+        """
+        val config = TestConfig("allowedAnnotations" to listOf("javax.inject.Inject"))
+        val findings = NoLateinitVar(config).compileAndLint(code)
+        findings shouldHaveSize 1
+    }
 }
