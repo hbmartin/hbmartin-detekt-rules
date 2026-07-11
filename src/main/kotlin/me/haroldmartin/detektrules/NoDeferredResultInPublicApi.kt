@@ -7,9 +7,14 @@ import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
+import io.gitlab.arturbosch.detekt.api.internal.RequiresTypeResolution
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 /**
  * Reports public functions and properties with an explicitly declared `Deferred` type. Returning a
@@ -25,6 +30,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
  * suspend fun fetchThing(): Thing = api.getThing()
  * </compliant>
  */
+@RequiresTypeResolution
 class NoDeferredResultInPublicApi(config: Config) : Rule(config) {
     override val issue = Issue(
         id = javaClass.simpleName,
@@ -36,35 +42,42 @@ class NoDeferredResultInPublicApi(config: Config) : Rule(config) {
 
     override fun visitNamedFunction(function: KtNamedFunction) {
         super.visitNamedFunction(function)
-        if (function.isPublic && !function.isLocal && function.typeReference?.text?.isDeferredType == true) {
-            report(
-                CodeSmell(
-                    issue = issue,
-                    entity = Entity.from(function),
-                    message = "${function.name ?: "Function"} should return the awaited value from a suspend " +
-                        "function instead of a Deferred.",
-                ),
-            )
-        }
+        if (!function.isReportableDeclaration()) return
+        if (function.typeReference?.isDeferredType(bindingContext) != true) return
+        report(
+            CodeSmell(
+                issue = issue,
+                entity = Entity.from(function),
+                message = "${function.name ?: "Function"} should return the awaited value from a suspend " +
+                    "function instead of a Deferred.",
+            ),
+        )
     }
 
     override fun visitProperty(property: KtProperty) {
         super.visitProperty(property)
-        if (property.isPublic && !property.isLocal && property.typeReference?.text?.isDeferredType == true) {
-            report(
-                CodeSmell(
-                    issue = issue,
-                    entity = Entity.from(property),
-                    message = "${property.name ?: "Property"} should not expose a Deferred, " +
-                        "prefer exposing the awaited value.",
-                ),
-            )
-        }
+        if (!property.isReportableDeclaration()) return
+        if (property.typeReference?.isDeferredType(bindingContext) != true) return
+        report(
+            CodeSmell(
+                issue = issue,
+                entity = Entity.from(property),
+                message = "${property.name ?: "Property"} should not expose a Deferred, " +
+                    "prefer exposing the awaited value.",
+            ),
+        )
     }
 }
 
-private val String.isDeferredType: Boolean
-    get() = this == "Deferred" ||
-        startsWith("Deferred<") ||
-        endsWith(".Deferred") ||
-        contains(".Deferred<")
+private fun KtNamedFunction.isReportableDeclaration(): Boolean =
+    isPublic && !isLocal && !hasModifier(KtTokens.OVERRIDE_KEYWORD)
+
+private fun KtProperty.isReportableDeclaration(): Boolean =
+    isPublic && !isLocal && !hasModifier(KtTokens.OVERRIDE_KEYWORD)
+
+private fun KtTypeReference.isDeferredType(bindingContext: BindingContext): Boolean =
+    bindingContext[BindingContext.TYPE, this]
+        ?.constructor
+        ?.declarationDescriptor
+        ?.fqNameSafe
+        ?.asString() == "kotlinx.coroutines.Deferred"

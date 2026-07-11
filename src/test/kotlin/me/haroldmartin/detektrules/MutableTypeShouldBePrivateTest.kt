@@ -45,4 +45,21 @@ internal class MutableTypeShouldBePrivateTest(private val env: KotlinCoreEnviron
         findings shouldHaveSize 1
         findings[0].message shouldBe "shouldError should be private since it is a mutable type."
     }
+
+    @Test
+    fun `matches nullable non-generic types against the allowlist`() {
+        val code = """
+        class MutableAllowed
+        class MutableReported
+
+        class Holder {
+            val allowed: MutableAllowed? = null
+            val reported: MutableReported? = null
+        }
+        """
+        val config = TestConfig("allowedTypes" to listOf("MutableAllowed"))
+        val findings = MutableTypeShouldBePrivate(config).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+        findings[0].message shouldBe "reported should be private since it is a mutable type."
+    }
 }

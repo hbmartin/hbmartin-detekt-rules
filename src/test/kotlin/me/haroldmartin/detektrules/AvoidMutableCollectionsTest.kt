@@ -71,6 +71,15 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
     }
 
     @Test
+    fun `reports once when initializer is a mutable subtype of the declared type`() {
+        val code = """
+        val values: MutableCollection<String> = mutableListOf()
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
     fun `reports on mutable collections within non mutable collections`() {
         val code = """
         val mutableSet = setOf(mutableSetOf<String>())
@@ -161,6 +170,19 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
         """
         val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0
+    }
+
+    @Test
+    fun `reports inside non-stdlib functions named like collection builders`() {
+        val code = """
+        fun buildList(block: () -> Unit) = block()
+
+        val built = buildList {
+            mutableListOf(1)
+        }
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
     }
 
     @Test

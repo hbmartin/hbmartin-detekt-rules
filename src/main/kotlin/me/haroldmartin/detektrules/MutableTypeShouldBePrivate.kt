@@ -43,7 +43,8 @@ class MutableTypeShouldBePrivate(config: Config) : Rule(config) {
         super.visitProperty(property)
         if (property.isPrivate()) return
         property.guessType()?.let { type ->
-            if (type.startsWith("Mutable") && !allowedTypes.any { it.matches(type.substringBefore('<')) }) {
+            val baseType = type.substringBefore('<').removeSuffix("?")
+            if (type.startsWith("Mutable") && !allowedTypes.any { it.matches(baseType) }) {
                 report(
                     CodeSmell(
                         issue = issue,
