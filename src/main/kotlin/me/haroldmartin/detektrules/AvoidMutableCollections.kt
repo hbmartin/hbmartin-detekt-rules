@@ -118,9 +118,9 @@ private fun KtExpression.isInsideCollectionBuilder(bindingContext: BindingContex
     .filterIsInstance<KtCallExpression>()
     .mapNotNull { it.calleeExpression as? KtNameReferenceExpression }
     .any { callee ->
-        bindingContext[BindingContext.REFERENCE_TARGET, callee]
-            ?.fqNameSafe
-            ?.asString() in BUILDER_FUNCTION_FQ_NAMES
+        bindingContext[BindingContext.REFERENCE_TARGET, callee]?.run {
+            fqNameSafe.asString() in BUILDER_FUNCTION_FQ_NAMES
+        } == true
     }
 
 private fun PsiElement.isInPrivateOrLocalScope(): Boolean =

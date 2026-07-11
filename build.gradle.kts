@@ -12,9 +12,6 @@ version = "0.1.7"
 
 dependencies {
     compileOnly(libs.detekt.api)
-    implementation("org.jetbrains.kotlin:kotlin-stdlib") {
-        version { strictly("2.0.21") }
-    }
 
     testImplementation(libs.detekt.test)
     testImplementation(libs.kotest.assertions.core)
