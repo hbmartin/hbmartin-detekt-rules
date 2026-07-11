@@ -38,6 +38,8 @@ class NoLateinitVar(config: Config) : Rule(config) {
 
     @Configuration("annotations that permit a lateinit var, e.g. ['Inject']")
     private val allowedAnnotations: List<String> by config(emptyList<String>())
+    private val allowedAnnotationShortNames: Set<String> =
+        allowedAnnotations.mapTo(mutableSetOf()) { it.substringAfterLast('.') }
 
     override fun visitProperty(property: KtProperty) {
         super.visitProperty(property)
@@ -53,9 +55,6 @@ class NoLateinitVar(config: Config) : Rule(config) {
         }
     }
 
-    private fun KtProperty.hasAllowedAnnotation(): Boolean = annotationEntries.any { entry ->
-        entry.shortName?.asString()?.let { shortName ->
-            allowedAnnotations.any { it.substringAfterLast('.') == shortName }
-        } == true
-    }
+    private fun KtProperty.hasAllowedAnnotation(): Boolean =
+        annotationEntries.any { it.shortName?.asString() in allowedAnnotationShortNames }
 }

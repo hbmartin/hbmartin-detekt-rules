@@ -77,7 +77,7 @@ private fun KtProperty.isReportableDeclaration(): Boolean =
 
 private fun KtTypeReference.isDeferredType(bindingContext: BindingContext): Boolean =
     bindingContext[BindingContext.TYPE, this]
-        ?.constructor
-        ?.declarationDescriptor
-        ?.fqNameSafe
-        ?.asString() == "kotlinx.coroutines.Deferred"
+        ?.run { constructor.declarationDescriptor }
+        ?.run {
+            fqNameSafe.asString()
+        } == "kotlinx.coroutines.Deferred"
