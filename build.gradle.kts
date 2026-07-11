@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "me.haroldmartin.detektrules"
-version = "0.1.7"
+version = "1.0.0"
 
 dependencies {
     compileOnly(libs.detekt.api)
