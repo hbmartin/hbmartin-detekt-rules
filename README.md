@@ -15,7 +15,7 @@ These are my opinions. There are many like them but these are mine. 😄
 
 Inside of your `dependencies` block add the following: (for more details see [adding more rule sets](https://github.com/detekt/detekt#adding-more-rule-sets))
 ```kotlin 
-detektPlugins("me.haroldmartin:hbmartin-detekt-rules:0.1.7")
+detektPlugins("me.haroldmartin:hbmartin-detekt-rules:1.0.0")
 ```
 
 Then add to your detekt configuration as in the section below to activate rules. Note that the AvoidFirstOrLastOnList, AvoidMutableCollections, and AvoidToIntOrThrowingConversions rules require [type resolution](https://detekt.dev/docs/gettingstarted/type-resolution) to be active.
