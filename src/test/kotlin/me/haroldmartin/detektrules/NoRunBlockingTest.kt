@@ -35,4 +35,13 @@ internal class NoRunBlockingTest {
         val findings = NoRunBlocking(Config.empty).compileAndLint(code)
         findings shouldHaveSize 0
     }
+
+    @Test
+    fun `does not report invoking a lambda expression`() {
+        val code = """
+        val answer = ({ 42 })()
+        """
+        val findings = NoRunBlocking(Config.empty).compileAndLint(code)
+        findings shouldHaveSize 0
+    }
 }

@@ -63,4 +63,13 @@ internal class AvoidToIntOrThrowingConversionsTest(private val env: KotlinCoreEn
         findings[0].message shouldContain "toIntOrNull(...)"
         findings[0].message shouldContain "toInt(...)"
     }
+
+    @Test
+    fun `does not report qualified property access`() {
+        val code = """
+        val shouldNotError = "five".length
+        """
+        val findings = AvoidToIntOrThrowingConversions(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
 }

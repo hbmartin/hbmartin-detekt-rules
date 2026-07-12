@@ -102,4 +102,27 @@ internal class NoDeferredResultInPublicApiTest(private val env: KotlinCoreEnviro
         val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 2
     }
+
+    @Test
+    fun `does not report inferred non Deferred or local function results`() {
+        val code = """
+        import kotlinx.coroutines.CoroutineScope
+        import kotlinx.coroutines.Deferred
+        import kotlinx.coroutines.async
+
+        class Repository(private val scope: CoroutineScope) {
+            fun inferredDeferred() = scope.async { "thing" }
+            val inferredDeferred = scope.async { "thing" }
+            fun immediate(): String = "thing"
+            val immediate: String = "thing"
+
+            fun awaitLocally() {
+                fun localDeferred(): Deferred<String> = scope.async { "thing" }
+                localDeferred()
+            }
+        }
+        """
+        val findings = NoDeferredResultInPublicApi(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
 }

@@ -219,4 +219,15 @@ internal class AvoidFirstOrLastOnListTest(private val env: KotlinCoreEnvironment
         val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0
     }
+
+    @Test
+    fun `does not report qualified property access or receiverless callable reference`() {
+        val code = """
+        fun first(): String = "first"
+        val shouldNotError = listOf("hi").size
+        val shouldNotErrorEither = ::first
+        """
+        val findings = AvoidFirstOrLastOnList(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
 }
