@@ -62,4 +62,14 @@ internal class MutableTypeShouldBePrivateTest(private val env: KotlinCoreEnviron
         findings shouldHaveSize 1
         findings[0].message shouldBe "reported should be private since it is a mutable type."
     }
+
+    @Test
+    fun `does not report a property whose type cannot be guessed syntactically`() {
+        val code = """
+        val calculated
+            get() = "value"
+        """
+        val findings = MutableTypeShouldBePrivate(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
 }

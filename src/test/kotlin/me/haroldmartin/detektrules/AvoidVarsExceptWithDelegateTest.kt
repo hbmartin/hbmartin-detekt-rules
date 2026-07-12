@@ -37,6 +37,22 @@ internal class AvoidVarsExceptWithDelegateTest(private val env: KotlinCoreEnviro
         ).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0
     }
+
+    @Test
+    fun `reports delegated var when delegate expression has no name`() {
+        val code = """
+        import kotlin.reflect.KProperty
+
+        operator fun Int.getValue(thisRef: Any?, property: KProperty<*>): Int = this
+        operator fun Int.setValue(thisRef: Any?, property: KProperty<*>, value: Int) = Unit
+
+        var delegated by 1
+        """
+        val findings = AvoidVarsExceptWithDelegate(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+        findings[0].message shouldBe "Property delegated is a delegated `var`iable but the delegate is " +
+            "not allowed. Change to val or configure allowed delegates regex list"
+    }
 }
 
 // Compilable stand-ins for Compose-style delegate providers used in the snippets above.

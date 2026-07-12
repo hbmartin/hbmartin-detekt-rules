@@ -213,4 +213,51 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
         val findings = AvoidMutableCollections(config).compileAndLintWithContext(env, code)
         findings shouldHaveSize 1
     }
+
+    @Test
+    fun `reports inferred public mutable collections when private and local are allowed`() {
+        val code = """
+        val mutableSet = mutableSetOf<String>()
+        """
+        val config = TestConfig("allowPrivateAndLocal" to "true")
+        val findings = AvoidMutableCollections(config).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `reports mutable initializer exposed as an immutable type`() {
+        val code = """
+        val values: Collection<Int> = mutableListOf()
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `reports mutable collection in a constructor argument`() {
+        val code = """
+        open class Base(val values: List<Int>)
+        class Child : Base(mutableListOf())
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
+
+    @Test
+    fun `reports mutable collection returned through an invoked lambda`() {
+        val code = """
+        val values = ({ mutableListOf(1) })()
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 2
+    }
+
+    @Test
+    fun `does not report concrete Java collection type`() {
+        val code = """
+        val values = ArrayList<Int>()
+        """
+        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
 }

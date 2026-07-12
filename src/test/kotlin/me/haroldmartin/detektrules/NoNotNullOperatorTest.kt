@@ -29,4 +29,14 @@ internal class NoNotNullOperatorTest(private val env: KotlinCoreEnvironment) {
         val findings = NoNotNullOperator(Config.empty).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0
     }
+
+    @Test
+    fun `does not report other postfix operators`() {
+        val code = """
+        var count = 0
+        count++
+        """
+        val findings = NoNotNullOperator(Config.empty).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 0
+    }
 }

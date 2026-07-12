@@ -115,6 +115,17 @@ inline fun myinline(function: () -> Unit) {
         val findings = NoCallbacksInFunctions(KeyedConfig("allowInline", true)).compileAndLintWithContext(env, code)
         findings shouldHaveSize 0
     }
+
+    @Test
+    fun `reports non inline callback when only inline callbacks are allowed`() {
+        val code = """
+        fun notInline(function: () -> Unit) {
+            function()
+        }
+        """
+        val findings = NoCallbacksInFunctions(KeyedConfig("allowInline", true)).compileAndLintWithContext(env, code)
+        findings shouldHaveSize 1
+    }
 }
 
 internal class KeyedConfig<X : Any>(private val key: String, private val value: X) : Config {
