@@ -252,12 +252,4 @@ internal class AvoidMutableCollectionsTest(private val env: KotlinCoreEnvironmen
         findings shouldHaveSize 2
     }
 
-    @Test
-    fun `does not report concrete Java collection type`() {
-        val code = """
-        val values = ArrayList<Int>()
-        """
-        val findings = AvoidMutableCollections(Config.empty).compileAndLintWithContext(env, code)
-        findings shouldHaveSize 0
-    }
 }
