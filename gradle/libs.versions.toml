@@ -2,7 +2,7 @@
 detekt = "1.23.8"
 junit = "5.14.4"
 junit-platform = "1.14.4"
-kotest = "5.9.1"
+kotest = "6.2.2"
 kotlinx-collections-immutable = "0.4.0"
 kotlinx-coroutines = "1.10.2"
 
